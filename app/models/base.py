@@ -1,6 +1,8 @@
 from typing import Optional, List
 from sqlmodel import Field, SQLModel, Relationship
 from datetime import date, datetime
+from sqlalchemy import Column
+import pgvector.sqlalchemy
 
 # --- Link Tables ---
 
@@ -63,6 +65,14 @@ class Bill(SQLModel, table=True):
     details: Optional[str] = None
     source_pdf: Optional[str] = Field(default=None, max_length=255, unique=True)
     source_md: Optional[str] = Field(default=None, max_length=255)
+    embedding_jina: Optional[List[float]] = Field(
+        default=None, 
+        sa_column=Column(pgvector.sqlalchemy.Vector(1024))
+    )
+    embedding_gemma: Optional[List[float]] = Field(
+        default=None, 
+        sa_column=Column(pgvector.sqlalchemy.Vector(768))
+    )
     created_at: Optional[datetime] = Field(default_factory=datetime.utcnow)
 
     # Relationships
