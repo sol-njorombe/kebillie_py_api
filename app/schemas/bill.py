@@ -70,3 +70,7 @@ class BillCreate(BillBase):
 class BillUpdate(BillBase):
     # All fields optional for update
     pass
+
+class BillEmbedRequest(BaseModel):
+    bill_ids: Optional[List[int]] = None
+    all_bills: bool = False

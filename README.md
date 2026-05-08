@@ -60,5 +60,7 @@ This project follows a "Convention over Configuration" structure:
 - `app/models/`: SQLModel database schemas.
 - `app/schemas/`: Pydantic models for data validation (DTOs).
 - `app/crud/`: Reusable database operations.
+- `app/services/`: External integrations and complex business logic (e.g. ML models).
+- `app/tasks/`: Asynchronous background jobs.
 - `app/core/`: Configuration and settings.
 - `app/db/`: Database connection and session management.

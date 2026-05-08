@@ -80,3 +80,31 @@ class Bill(SQLModel, table=True):
     highlights: List[Highlight] = Relationship(back_populates="bill")
     sponsors: List[Sponsor] = Relationship(back_populates="bills", link_model=BillSponsorLink)
     topics: List[Topic] = Relationship(back_populates="bills", link_model=BillTopicLink)
+
+    def get_embeddable_text(self) -> str:
+        """Constructs a combined string of bill content for embedding."""
+        parts = []
+        if self.bill_number:
+            parts.append(f"Bill Number: {self.bill_number}")
+        if self.date_published:
+            parts.append(f"Date Published: {self.date_published}")
+        if self.gazette_number:
+            parts.append(f"Gazette Number: {self.gazette_number}")
+        if self.origin and self.origin.name:
+            parts.append(f"Origin: {self.origin.name}")
+        if self.sponsors:
+            sponsor_names = ", ".join([s.name for s in self.sponsors if s.name])
+            if sponsor_names:
+                parts.append(f"Sponsors: {sponsor_names}")
+        if self.topics:
+            topic_names = ", ".join([t.name for t in self.topics if t.name])
+            if topic_names:
+                parts.append(f"Topics: {topic_names}")
+        if self.title:
+            parts.append(f"Title: {self.title}")
+        if self.hook:
+            parts.append(f"Hook: {self.hook}")
+        if self.details:
+            parts.append(f"Details: {self.details}")
+            
+        return "\n".join(parts)
