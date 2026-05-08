@@ -3,9 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlmodel import Session
 
 from app.crud import crud_bill
-from app.schemas.bill import BillRead, BillCreate, BillEmbedRequest
+from app.schemas.bill import BillRead, BillCreate, BillEmbedRequest, BillSearchResult
 from app.db.session import get_db
 from app.tasks.embedding_tasks import process_bill_embeddings
+from app.services.embedding import get_embedding_service
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -32,6 +34,30 @@ def create_bill(
     """
     bill = crud_bill.create_bill(db, bill_in=bill_in)
     return bill
+
+@router.get("/search", response_model=List[BillSearchResult])
+def search_bills(
+    query: str,
+    limit: int = 5,
+    db: Session = Depends(get_db)
+) -> Any:
+    """
+    Search bills using semantic vector similarity.
+    """
+    # 1. Vectorize the string query
+    service = get_embedding_service()
+    search_vector = service.get_search_vector(query)
+    
+    # 2. Query the database using pgvector
+    results = crud_bill.search_bills_by_similarity(
+        db=db, 
+        query_vector=search_vector, 
+        limit=limit,
+        min_similarity=settings.MIN_SEARCH_SIMILARITY
+    )
+    
+    # 3. Format response
+    return [{"bill": bill, "similarity_score": score} for bill, score in results]
 
 @router.get("/{bill_id}", response_model=BillRead)
 def read_bill(

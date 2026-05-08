@@ -74,3 +74,7 @@ class BillUpdate(BillBase):
 class BillEmbedRequest(BaseModel):
     bill_ids: Optional[List[int]] = None
     all_bills: bool = False
+
+class BillSearchResult(BaseModel):
+    bill: BillRead
+    similarity_score: float
