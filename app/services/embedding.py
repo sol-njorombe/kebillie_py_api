@@ -43,6 +43,32 @@ class JinaEmbeddingService(BaseEmbeddingService):
         vector = self.model.encode(prefixed_text, task="retrieval")
         return vector.tolist()
 
+class GemmaEmbeddingService(BaseEmbeddingService):
+    """
+    EmbeddingGemma 3 Service.
+    Loads the google/embeddinggemma-300m model.
+    """
+    def __init__(self):
+        import logging
+        logging.getLogger().setLevel(logging.INFO)
+        logging.info("Loading Gemma Embedding Model... (this may take a moment)")
+        
+        from sentence_transformers import SentenceTransformer
+        self.model = SentenceTransformer("google/embeddinggemma-300m", trust_remote_code=True)
+        logging.info("Gemma Embedding Model loaded successfully!")
+
+    def get_content_vector(self, text: str) -> List[float]:
+        # Gemma requires specific instructional prefixes
+        prefixed_text = f"title: none | text: {text}"
+        vector = self.model.encode(prefixed_text)
+        return vector.tolist()
+
+    def get_search_vector(self, text: str) -> List[float]:
+        # Gemma uses this format for search queries
+        prefixed_text = f"task: search result | query: {text}"
+        vector = self.model.encode(prefixed_text)
+        return vector.tolist()
+
 # Singleton-like instance to avoid reloading the model if imported multiple times
 _embedding_service_instance = None
 
@@ -62,7 +88,7 @@ def get_embedding_service() -> BaseEmbeddingService:
     if model_choice == "jina":
         _embedding_service_instance = JinaEmbeddingService()
     elif model_choice == "gemma":
-        raise NotImplementedError("EmbeddingGemma 3 is not implemented yet.")
+        _embedding_service_instance = GemmaEmbeddingService()
     else:
         raise ValueError(f"Unknown ACTIVE_EMBEDDING_MODEL: {model_choice}")
         

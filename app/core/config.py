@@ -4,7 +4,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     SECRET_KEY: str
     ACTIVE_EMBEDDING_MODEL: str = "jina"
-    MIN_SEARCH_SIMILARITY: float = 0.5
+    JINA_MIN_SEARCH_SIMILARITY: float = 0.5
+    GEMMA_MIN_SEARCH_SIMILARITY: float = 0.5
 
     class Config:
         env_file = ".env"

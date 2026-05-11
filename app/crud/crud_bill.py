@@ -47,13 +47,15 @@ def create_bill(db: Session, bill_in: BillCreate) -> Bill:
     db.refresh(db_bill)
     return db_bill
 
-def search_bills_by_similarity(db: Session, query_vector: list[float], limit: int = 5, min_similarity: float = 0.5):
+def search_bills_by_similarity(db: Session, query_vector: list[float], limit: int = 5):
     from app.core.config import settings
     
     if settings.ACTIVE_EMBEDDING_MODEL.lower() == "jina":
         cosine_distance = Bill.embedding_jina.cosine_distance(query_vector)
+        min_similarity = settings.JINA_MIN_SEARCH_SIMILARITY
     else:
         cosine_distance = Bill.embedding_gemma.cosine_distance(query_vector)
+        min_similarity = settings.GEMMA_MIN_SEARCH_SIMILARITY
         
     similarity = (1 - cosine_distance).label("similarity_score")
     

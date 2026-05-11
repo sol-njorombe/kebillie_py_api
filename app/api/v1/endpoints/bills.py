@@ -52,8 +52,7 @@ def search_bills(
     results = crud_bill.search_bills_by_similarity(
         db=db, 
         query_vector=search_vector, 
-        limit=limit,
-        min_similarity=settings.MIN_SEARCH_SIMILARITY
+        limit=limit
     )
     
     # 3. Format response
