@@ -9,3 +9,6 @@ sentence-transformers
 torch
 numpy<2
 peft
+docling
+python-multipart
+pandas
